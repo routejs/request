@@ -1,7 +1,9 @@
 import parseNodeRequest from "./request/node.mjs";
 const supportedServers = ["node"];
 
-export default function request(context, options = {}) {
+export default function request(context, options = { server: "node" }) {
+  // Set default values
+  options.server = options.server || "node";
   // Create http request object
   if (
     options.server &&

@@ -1,7 +1,9 @@
 const parseNodeRequest = require("./request/node.cjs");
 const supportedServers = ["node"];
 
-module.exports = function request(context, options = {}) {
+module.exports = function request(context, options = { server: "node" }) {
+  // Set default values
+  options.server = options.server || "node";
   // Create http request object
   if (
     options.server &&

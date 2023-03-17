@@ -8,8 +8,24 @@ import net from "net";
 
 export default function (
   { req, res },
-  options = { proxy: false, subdomainOffset: 0 }
+  options = {
+    subdomainOffset: 2,
+    proxy: false,
+    proxyIpHeader: "X-Forwarded-For",
+    maxIpsCount: 0,
+    proxyHostHeader: "X-Forwarded-Host",
+    proxyProtocolHeader: "X-Forwarded-Proto",
+  }
 ) {
+  // Set default values
+  options.subdomainOffset = options.subdomainOffset || 2;
+  options.proxy = options.proxy || false;
+  options.proxyIpHeader = options.proxyIpHeader || "X-Forwarded-For";
+  options.maxIpsCount = options.maxIpsCount || 0;
+  options.proxyHostHeader = options.proxyHostHeader || "X-Forwarded-Host";
+  options.proxyProtocolHeader =
+    options.proxyProtocolHeader || "X-Forwarded-Proto";
+
   Object.defineProperties(req, {
     cookies: {
       get() {
@@ -27,7 +43,7 @@ export default function (
       get() {
         let host;
         if (options.proxy) {
-          host = this.get("X-Forwarded-Host");
+          host = this.get(options.proxyHostHeader);
         }
         host = host || this.get("Host");
         // Note: X-Forwarded-Host is normally a single value, but it is safe to return first value.
@@ -52,7 +68,7 @@ export default function (
       get() {
         let ip;
         if (options.proxy) {
-          ip = this.get("X-Forwarded-For");
+          ip = this.get(options.proxyIpHeader);
         }
         ip = ip || this.socket.remoteAddress;
         return ip ? ip.split(/\s*,\s*/, 1)[0] : null;
@@ -63,10 +79,14 @@ export default function (
       get() {
         let ip;
         if (options.proxy) {
-          ip = this.get("X-Forwarded-For");
+          ip = this.get(options.proxyIpHeader);
         }
         ip = ip || this.socket.remoteAddress;
-        return ip ? ip.split(/\s*,\s*/) : [];
+        ips = ip ? ip.split(/\s*,\s*/) : [];
+        if (options.maxIpsCount > 0) {
+          ips = ips.slice(-options.maxIpsCount);
+        }
+        return ips;
       },
     },
 
@@ -90,13 +110,9 @@ export default function (
         let protocol;
         if (options.proxy) {
           protocol =
-            this.get("X-Forwarded-Proto")?.toLowerCase() ||
-            this.get("X-Forwarded-Protocol")?.toLowerCase() ||
-            this.get("X-Url-Scheme")?.toLowerCase() ||
-            (this.get("X-Forwarded-Ssl")?.toLowerCase() === "on" ||
-            this.get("Front-End-Https")?.toLowerCase() === "on"
+            this.get(options.proxyProtocolHeader)?.toLowerCase() === "https"
               ? "https"
-              : "http");
+              : "http";
         }
         protocol = protocol || (this.socket.encrypted ? "https" : "http");
         // Note: X-Forwarded-Proto is normally a single value, but it is safe to return first value.
@@ -106,7 +122,7 @@ export default function (
 
     query: {
       get() {
-        return qs.parse(parseurl(this)?.query ?? "") ?? null;
+        return qs.parse(parseurl(this)?.query ?? "") ?? {};
       },
     },
 

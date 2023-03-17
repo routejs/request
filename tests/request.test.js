@@ -1,10 +1,10 @@
 const supertest = require("supertest");
-const request = require("../index.cjs");
+const requestWrapper = require("../index.cjs");
 
 describe("Request test", () => {
   test("Get header", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.header("x-name"));
     })
       .get("/")
@@ -17,7 +17,7 @@ describe("Request test", () => {
 
   test("Get header application/json", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.get("content-type"));
     })
       .get("/")
@@ -30,7 +30,7 @@ describe("Request test", () => {
 
   test("Check request is json", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.is("json", "html"));
     })
       .get("/")
@@ -43,7 +43,7 @@ describe("Request test", () => {
 
   test("Check request accepts json", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.accepts("json"));
     })
       .get("/")
@@ -56,7 +56,7 @@ describe("Request test", () => {
 
   test("Check request accepts html", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(JSON.stringify(req.accepts("html")));
     })
       .get("/")
@@ -69,7 +69,7 @@ describe("Request test", () => {
 
   test("Check request accepts language en", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.acceptsLanguages("en"));
     })
       .get("/")
@@ -82,7 +82,7 @@ describe("Request test", () => {
 
   test("Check request accepts language sp", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(JSON.stringify(req.acceptsLanguages("sp")));
     })
       .get("/")
@@ -95,7 +95,7 @@ describe("Request test", () => {
 
   test("Check request accepts charset utf-8", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.acceptsCharsets("utf-8"));
     })
       .get("/")
@@ -108,7 +108,7 @@ describe("Request test", () => {
 
   test("Check request accepts charset utf-16", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(JSON.stringify(req.acceptsCharsets("utf-16")));
     })
       .get("/")
@@ -121,7 +121,7 @@ describe("Request test", () => {
 
   test("Check request accepts encoding gzip", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.acceptsEncodings("gzip"));
     })
       .get("/")
@@ -134,7 +134,7 @@ describe("Request test", () => {
 
   test("Check request accepts encoding deflate", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(JSON.stringify(req.acceptsEncodings("deflate")));
     })
       .get("/")
@@ -147,7 +147,7 @@ describe("Request test", () => {
 
   test("Get query string", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.query.name);
     })
       .get("/?name=abc")
@@ -159,7 +159,7 @@ describe("Request test", () => {
 
   test("Get query string", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(JSON.stringify(req.query));
     })
       .get("/?name[]=abc&name[]=10")
@@ -171,7 +171,7 @@ describe("Request test", () => {
 
   test("Get url path", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.path);
     })
       .get("/blog/post/id?id=20")
@@ -183,7 +183,7 @@ describe("Request test", () => {
 
   test("Get request host", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.host);
     })
       .get("/")
@@ -196,7 +196,7 @@ describe("Request test", () => {
 
   test("Get request hostname", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.hostname);
     })
       .get("/")
@@ -209,20 +209,20 @@ describe("Request test", () => {
 
   test("Get request subdomains", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req }, { subdomainOffset: 1 });
       res.end(JSON.stringify(req.subdomains));
     })
       .get("/")
       .set("Host", "blog.localhost:3000")
       .expect(200)
       .then((res) => {
-        expect(res.text).toBe(JSON.stringify(["localhost", "blog"]));
+        expect(res.text).toBe(JSON.stringify(["blog"]));
       });
   });
 
   test("Get request protocol", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.protocol);
     })
       .get("/")
@@ -234,7 +234,7 @@ describe("Request test", () => {
 
   test("Get request origin", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.origin);
     })
       .get("/")
@@ -247,7 +247,7 @@ describe("Request test", () => {
 
   test("Get full url", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.fullUrl);
     })
       .get("")
@@ -260,7 +260,7 @@ describe("Request test", () => {
 
   test("Get full url", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.fullUrl);
     })
       .get("/blog?id=100&special=^./$")
@@ -273,7 +273,7 @@ describe("Request test", () => {
 
   test("Get cookie", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(req.cookies.name);
     })
       .get("/")
@@ -286,7 +286,7 @@ describe("Request test", () => {
 
   test("Get ip", async () => {
     await supertest(function (req, res) {
-      req = request({ req }, { proxy: true });
+      req = requestWrapper({ req }, { proxy: true });
       res.end(req.ip);
     })
       .get("/")
@@ -299,7 +299,7 @@ describe("Request test", () => {
 
   test("Get ips", async () => {
     await supertest(function (req, res) {
-      req = request({ req }, { proxy: true });
+      req = requestWrapper({ req }, { proxy: true });
       res.end(req.ips.join(","));
     })
       .get("/")
@@ -312,7 +312,7 @@ describe("Request test", () => {
 
   test("Get secure", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(JSON.stringify(req.secure));
     })
       .get("/")
@@ -324,7 +324,7 @@ describe("Request test", () => {
 
   test("Get xhr", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(JSON.stringify(req.xhr));
     })
       .get("/")
@@ -336,7 +336,7 @@ describe("Request test", () => {
 
   test("Get xhr", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(JSON.stringify(req.xhr));
     })
       .get("/")
@@ -349,7 +349,7 @@ describe("Request test", () => {
 
   test("Get range", async () => {
     await supertest(function (req, res) {
-      req = request({ req });
+      req = requestWrapper({ req });
       res.end(JSON.stringify(req.range(500)));
     })
       .get("/")

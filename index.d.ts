@@ -5,8 +5,12 @@ declare interface context {
 
 declare interface options {
   server: string;
-  proxy?: boolean;
   subdomainOffset?: number;
+  proxy?: boolean;
+  proxyIpHeader?: string;
+  maxIpsCount?: number;
+  proxyHostHeader?: string;
+  proxyProtocolHeader?: string;
 }
 
 declare interface Request {
@@ -23,13 +27,13 @@ declare interface Request {
   secure: boolean;
   subdomains: string[];
   xhr: boolean;
-  accepts: (...type: string) => string | string[] | false;
-  acceptsCharsets: (...charsets: string) => string | string[] | false;
-  acceptsEncodings: (...encodings: string) => string | string[] | false;
-  acceptsLanguages: (...languages: string) => string | string[] | false;
+  accepts: (...type: string[]) => string | string[] | false;
+  acceptsCharsets: (...charsets: string[]) => string | string[] | false;
+  acceptsEncodings: (...encodings: string[]) => string | string[] | false;
+  acceptsLanguages: (...languages: string[]) => string | string[] | false;
   get: (name: string) => string | null;
-  header: (name) => string | null;
-  is: (...types: string) => string | false;
+  header: (name: string) => string | null;
+  is: (...types: string[]) => string | false;
   range: (size: number, options?: object) => object[];
 }
 
