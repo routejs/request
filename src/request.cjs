@@ -10,7 +10,7 @@ module.exports = function request(context, options = { server: "node" }) {
     (typeof options.server === "string" || options.server instanceof String)
   ) {
     if (!supportedServers.includes(options.server.toLowerCase())) {
-      throw new TypeError(`Error: ${options.server} is not supported`);
+      throw new TypeError(options.server + " is not supported");
     }
 
     if (options.server.toLowerCase() === "node") {
